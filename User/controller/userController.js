@@ -1,11 +1,11 @@
-const userService = require('../service/userService');
+const userApplicationService = require('../Service/userApplicationService');
 
-exports.getUser = async (req, res) => {
+exports.signUp = async (req, res) => {
     try{
-        const user = await userService.getAllUsers();
-        res.send(user);
-    } catch(err){
-        console.error("getUser occured Error : ", err);
-        res.status(500).send("Server Error");
+        const {username, password} = req.body;
+        await userApplicationService.signUp(username, password);
+        res.status(201).send({ message: '회원가입 완료' }); 
+    } catch(err) {
+        res.status(500).send({ error: err.message }); 
     }
 }
