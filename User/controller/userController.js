@@ -1,6 +1,8 @@
+const jwt = require('jsonwebtoken');
 const userApplicationService = require('../Service/userApplicationService');
 
-exports.signUp = async (req, res) => {
+// 회원가입
+module.exports.signUp = async (req, res) => {
     try{
         const {username, password} = req.body;
         await userApplicationService.signUp(username, password);

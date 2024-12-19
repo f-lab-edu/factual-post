@@ -24,12 +24,12 @@ module.exports.getConnection = async (isTransaction = false) => {
   }
 }
 
-module.exports.commitTransaction = async (connection) => {
-  await connection.commit();
-  connection.release();
-}
-
-module.exports.rollbackTransaction = async (connection) => {
-  await connection.rollback();
-  connection.release();
+module.exports.endTransaction = async(connection, type) => {
+  try{
+    type === 'commit' ? await connection.commit() : await connection.rollback();
+  } catch(err){
+    throw err; 
+  }finally {
+    connection.release();
+  }
 }
