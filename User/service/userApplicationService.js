@@ -7,9 +7,8 @@ module.exports.signUp = async (username, password) => {
     try{
         const user = new User(username, password);
         await UserService.isExist(username);
-        const encodePassword = await UserService.encodePassword(password);
-        user.password = encodePassword;
-        await UserRepository.save(user);
+        await user.encodePassword(password);
+        await UserRepository.createUser(user);
     } catch(err) {
         throw err;
     }

@@ -1,6 +1,6 @@
 const {getConnection, endTransaction} = require('../../databaseConnection');
 
-module.exports.save = async (User) => {
+module.exports.createUser = async (User) => {
     let connection;
     try{
         connection = await getConnection(true);
