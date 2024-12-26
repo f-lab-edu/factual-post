@@ -1,35 +1,42 @@
 const mysql2 = require('mysql2/promise');
 
+// sever core : 6
+// node worker thread : 4
+// node process : 6
+// connectionLimit : 10 ~ 20
+// mysql maximum connection : 151
+
+
 const mysqlConfig = {
   host: "localhost",
   port: process.env.DATABASE_PORT,
   user: process.env.DATABASE_USER,
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME, 
-  connectionLimit: 100,
+  connectionLimit: 10, 
 }
 
 const DatabasePool = mysql2.createPool(mysqlConfig);
 
-exports.getConnection = async () => {
-  try {
-    return await DatabasePool.getConnection();
+module.exports.getConnection = async (isTransaction = false) => {
+  const connection = await DatabasePool.getConnection();
+  try{
+    if(isTransaction){
+      await connection.beginTransaction();
+    }
+    return connection;
   } catch(err) {
-    console.error("Database is not connect");
+    connection.release();
     throw err;
   }
 }
 
-//async function connectionDatabase() {
- // return new Promise((resolve, reject) => {
-    //DatabasePool.getConnection((err, connection) => {
-     // if(err){
-      //  reject(err);
-     // } else{
-    //    resolve([connection, () => { connection.release(); }])
-   //   }
-   // })
-  //})
-//}
-
-// module.exports = connectionDatabase;
+module.exports.endTransaction = async(connection, type) => {
+  try{
+    type === 'commit' ? await connection.commit() : await connection.rollback();
+  } catch(err){
+    throw err; 
+  }finally {
+    connection.release();
+  }
+}

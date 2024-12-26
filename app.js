@@ -25,7 +25,7 @@ app.use(session({
 
 // 전체 내용을 이해 했다면, use 한곳에 담아보자. 258page
 
-const userRouter = require('./User/router/userRouter');
+const userRouter = require('./User/Router/userRouter');
 app.use('/user', userRouter);
 
 app.get('/', (req, res) => {
