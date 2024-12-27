@@ -24,3 +24,29 @@ module.exports.isExist = async (username) => {
         if(connection) connection.release();
     }
 }
+
+module.exports.loginVerification = async (username) => {
+    const connection = await getConnection();
+    try{
+        const [result] = await connection.query("select * from User where username = ?", username);
+        return result[0];
+    } catch(err) {
+        throw new Error('User Repository Check Error');
+    } finally {
+        if(connection) connection.release();
+    }
+}
+
+module.exports.findAllUser = async () => {
+
+    const connection = await getConnection();
+    try{
+        const [user] = await connection.query("select * from User");
+        return user;
+    } catch(err) {
+        throw new Error('Find All User Repository Err');
+    } finally {
+        if(connection) connection.release();
+    }
+
+}
