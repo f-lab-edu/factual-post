@@ -4,7 +4,8 @@ dotenv.config();
 const express = require('express')
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
+const SingletonContainer = require('./src/Container/SingletonContainer');
+
 const app = express();
 
 app.set('port', process.env.PORT || 4445);
@@ -13,10 +14,20 @@ app.use(express.json()); // raw(), text()
 app.use(express.urlencoded({extended: false})); // query string, post, put not use stream 
 app.use(cookieParser()); 
 
-// 전체 내용을 이해 했다면, use 한곳에 담아보자. 258page
+const singletonContainer = new SingletonContainer();
+const Redis = require('./src/Redis/redis');
+const JWTService = require('./src/Auth/jwt/jwt');
+const AuthJWT = require('./src/Auth/jwt/authJWT');
+const AuthInterface= require('./src/Interface/authInterface');
+singletonContainer.register('redis', new Redis());
+singletonContainer.register('jwtService', new JWTService(singletonContainer.get('redis')));
 
-const userRouter = require('./User/Router/userRouter');
-app.use('/user', userRouter);
+const jwtService = singletonContainer.get('jwtService');
+const jwtAuthMiddleware = new AuthInterface(new AuthJWT(jwtService));
+
+
+const userRouter = require('./src/User/Router/userRouter');
+app.use('/user', userRouter(jwtAuthMiddleware));
 
 app.get('/', (req, res) => {
   res.send('Hello world!');
