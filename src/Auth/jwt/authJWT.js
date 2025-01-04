@@ -1,3 +1,5 @@
+const { setAuthHeader, splitAuthorizationType } = require('../Util/authUtil');
+
 class VerifyToken {
     constructor(jwtService) {
         this.jwtService = jwtService;
@@ -60,7 +62,7 @@ class AuthJWT extends VerifyToken {
         }
 
         const newAccessToken = this.sign(payload);
-        res.setHeader('Authorization', `Bearer ${newAccessToken}`);
+        setAuthHeader(res, newAccessToken);
         this.attachUserToRequest(req, payload);
         
         return true;
@@ -77,8 +79,8 @@ class AuthJWT extends VerifyToken {
         if (!authorizationHeader) {
             return null;
         }
-        
-        return authorizationHeader.split('Bearer ')[1];
+
+        return splitAuthorizationType(authorizationHeader);
     }
 }
 

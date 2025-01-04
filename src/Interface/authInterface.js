@@ -7,7 +7,7 @@ class AuthStrategy {
         try{
             const isAuthenticated = await this.strategy.authenticate(req, res);
             if(!isAuthenticated) {
-                return res.status(401).send({ message:});
+                return res.status(401).send({ message });
             }
             
             return next();

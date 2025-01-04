@@ -1,4 +1,5 @@
 const userApplicationService = require('../service/userApplicationService');
+const {setAuthHeader} = require('../../Auth/Util/authUtil');
 const REFRESH_TOKEN_EXPIRES = process.env.REFRESH_TOKEN_EXPIRES_IN_DAYS * 24 * 60 * 60 * 1000;
 
 module.exports.signUp = async (req, res) => {
@@ -15,7 +16,7 @@ module.exports.login = async (req, res) => {
     try{
         const { username, password } = req.body;
         const { accessToken, refreshToken } = await userApplicationService.login(username, password);
-        res.setHeader('Authorization', `Bearer ${accessToken}`);
+        setAuthHeader(res, accessToken);
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: false,
