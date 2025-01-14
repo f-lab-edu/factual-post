@@ -1,47 +1,47 @@
-const { setAuthHeader, splitAuthorizationType } = require('../Util/authUtil');
+import {Request, Response} from 'express';
+import { setAuthHeader, splitAuthorizationType, extractUserPayload } from '../Util/authUtil';
+import { JwtPayload } from 'jsonwebtoken';
+import JWTService from './jwt';
 
 class VerifyToken {
-    constructor(jwtService) {
+    private jwtService: JWTService;
+
+    constructor(jwtService: JWTService) {
         this.jwtService = jwtService;
     }
 
-    verifyAccessToken(accessToken) {
+    verifyAccessToken(accessToken: string): JwtPayload {
         const payload = this.jwtService.getAccessTokenPayload(accessToken);
         if (!payload.ok) {
-            throw new Error(payload.message);
+            throw new Error(payload.message || 'Invalid access token');
         }
-        
-        return payload;
+        return extractUserPayload(payload);
     }
 
-    verifyRefreshToken(refreshToken, userId) {
-        return this.jwtService.compareRefreshToken(refreshToken, userId);
+    async verifyRefreshToken(refreshToken: string, userId: number): Promise<JwtPayload> {
+        return await this.jwtService.compareRefreshToken(refreshToken, userId);
     }
 
-    decodedAccessToken(accessToken) {
+    decodedAccessToken(accessToken: string): JwtPayload {
         return this.jwtService.decodedAccessToken(accessToken);
     }
 
-    sign(payload) {
+    sign(payload: JwtPayload): string {
         return this.jwtService.sign(payload);
     }
 }
 
 class AuthJWT extends VerifyToken {
-    constructor(jwtService) {
-        super(jwtService);
-        this.JWT_EXPIRED = Symbol('jwt expired');
-    }
+    private JWT_EXPIRED = Symbol('jwt expired');
 
-    async authenticate(req, res) {
+    async authenticate(req: Request, res: Response): Promise<boolean> {
         const accessToken = this.extractAccessToken(req.headers.authorization);
         try {
-            if (!accessToken) {
-                throw new Error('Access token이 존재하지 않습니다.');
+            if (accessToken === null) {
+                throw new Error('Access token is missing.');
             }
             const payload = this.verifyAccessToken(accessToken);
             this.attachUserToRequest(req, payload);
-            
             return true;
         } catch (err) {
             if (err.message === this.JWT_EXPIRED.description) {
@@ -52,7 +52,7 @@ class AuthJWT extends VerifyToken {
         }
     }
 
-    async refreshTokenVerification(req, res, accessToken) {
+    async refreshTokenVerification(req : Request, res : Response , accessToken : string) {
         const payload = this.decodedAccessToken(accessToken);
         const refreshToken = req.cookies.refreshToken;
         const refreshTokenCompareResult = await this.verifyRefreshToken(refreshToken, payload.id);
@@ -68,20 +68,15 @@ class AuthJWT extends VerifyToken {
         return true;
     }
 
-    attachUserToRequest(req, accessTokenPayload) {
-        req.user = {
-            id: accessTokenPayload.id,
-            username: accessTokenPayload.username
-        };
+    private extractAccessToken(authorization: string | undefined): string | null {
+        if (!authorization) return null;
+
+        return splitAuthorizationType(authorization);
     }
 
-    extractAccessToken(authorizationHeader) {
-        if (!authorizationHeader) {
-            return null;
-        }
-
-        return splitAuthorizationType(authorizationHeader);
+    private attachUserToRequest(req: Request, payload: JwtPayload): void {
+        req.user = payload;
     }
 }
 
-module.exports = AuthJWT;
+export default AuthJWT;
