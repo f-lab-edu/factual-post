@@ -1,6 +1,5 @@
-const bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt';
 
-// magic number
 const MINIMUM_ID_SIZE = 2;
 const MAXIMUM_ID_SIZE = 20;
 const MINIMUM_PW_SIZE = 8;
@@ -9,18 +8,21 @@ const SPECIAL_CHAR_COUNT = 1;
 const PASSWORD_ROUND = 10;
 
 class User {
-    constructor(username, password) {
-        this.username = username;
+    userId: string;
+    password: string;
+
+    constructor(userId: string, password: string) {
+        this.userId = userId;
         this.password = password;
         this.validateUsernameAndPassword();
     }
 
-    validateUsernameAndPassword() {
-        if (!this.username) {
+    validateUsernameAndPassword(): void {
+        if (!this.userId) {
             throw new Error('아이디가 입력되지 않았습니다.');
         }
 
-        if (!this.userIdSizeRange(this.username)) {
+        if (!this.userIdSizeRange(this.userId)) {
             throw new Error(`ID는 ${MINIMUM_ID_SIZE}자 이상, ${MAXIMUM_ID_SIZE}자 이하여야 합니다.`);
         }
 
@@ -35,30 +37,30 @@ class User {
             );
         }
     }
-    
-    async encodePassword() {
+
+    async encodePassword(): Promise<void> {
         this.password = await bcrypt.hash(this.password, PASSWORD_ROUND);
     }
 
-    containSpecialCharacter(password) {
+    containSpecialCharacter(password: string): boolean {
         const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
-        
         return specialCharRegex.test(password);
     }
-    userIdSizeRange(username) {
-        return username.length >= MINIMUM_ID_SIZE && username.length <= MAXIMUM_ID_SIZE;
+
+    userIdSizeRange(userId: string): boolean {
+        return userId.length >= MINIMUM_ID_SIZE && userId.length <= MAXIMUM_ID_SIZE;
     }
-    passwordSizeRange(password) {
+
+    passwordSizeRange(password: string): boolean {
         return password.length >= MINIMUM_PW_SIZE && password.length <= MAXIMUM_PW_SIZE;
     }
 
-    isValidPassword(password) {
+    isValidPassword(password: string): boolean {
         return (
             this.passwordSizeRange(password) &&
             this.containSpecialCharacter(password)
         );
     }
-
 }
 
-module.exports = User;
+export default User;

@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "esnext",                  // 최신 JavaScript 문법으로 컴파일
+    "module": "CommonJS",                 // ES 모듈 사용
+    "experimentalDecorators": true,     // 데코레이터 지원 (TypeORM 등에서 사용)
+    "emitDecoratorMetadata": true,      // 메타데이터를 생성 (TypeORM에서 사용)
+    "moduleResolution": "node",         // Node.js 모듈 해석 방식
+    "esModuleInterop": true,            // CommonJS와 ES 모듈 호환성
+    "allowJs": true,                    // JS와 TS 파일 함께 사용 허용
+    "checkJs": false,                   // JS 파일 타입 검사를 비활성화
+    "forceConsistentCasingInFileNames": true, // 파일 대소문자 일관성 검사
+    "outDir": "./dist",                 // 컴파일된 파일 출력 디렉토리
+    "rootDir": "./src",                 // 소스 파일 위치
+    "resolveJsonModule": true,          // JSON 파일 가져오기 허용
+    "isolatedModules": true             // 독립 모듈 컴파일 활성화
+  },
+  "include": ["src/**/*"],            // 컴파일 포함 파일
+  "exclude": ["node_modules", "dist"], // 컴파일 제외 파일
+  "ts-node": {
+    "esm": true
+  },
+}
