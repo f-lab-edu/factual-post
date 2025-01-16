@@ -1,11 +1,12 @@
 import { RedisClientType, createClient } from 'redis';
-import CacheMemoryInterface from '../Interface/cacheInterface';
+import { ICacheMemory } from '../Interface/interface';
+import { injectable } from 'inversify';
 
-class Redis extends CacheMemoryInterface {
+@injectable()
+class Redis implements ICacheMemory {
     private redisClient: RedisClientType;
 
     constructor() {
-        super();
         this.redisClient = createClient({ url: `redis://localhost:${process.env.REDIS_PORT_NUMBER}` });
         (async () => {
             try {

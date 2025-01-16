@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import * as UserRepository from '../repository/userRepository';
 import { UserInformation } from '../../types';
 import JWTService from '../../Auth/jwt/jwt';
-import Redis from '../../Redis/redis';
+import { ICacheMemory } from '../../Interface/interface';
 
 const NumberToStringUserId = (id: number) => {
     return id.toString();
@@ -28,7 +28,7 @@ export const login = async (
     userId: string,
     password: string, 
     jwtService: JWTService, 
-    cachedMemory: Redis
+    cachedMemory: ICacheMemory
 ): Promise<{ accessToken: string, refreshToken: string }> => {
     new User(userId, password);
     const userInformation = await userLoginVerification(userId, password);

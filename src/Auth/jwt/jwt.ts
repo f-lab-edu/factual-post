@@ -1,17 +1,17 @@
+import { injectable, inject } from 'inversify';
 import jwt, { SignOptions, Algorithm, JwtPayload } from 'jsonwebtoken';
 import { extractUserPayload } from '../Util/authUtil';
+import { TYPES } from '../../types';
+import {ICacheMemory} from '../../Interface/interface';
 
-interface ICachedMemory {
-    get(key: string): Promise<string | null>;
-}
-
+@injectable()
 class JWTService {
-    private cachedMemory: ICachedMemory;
+    private cachedMemory: ICacheMemory;
     private JWT_SECRET_KEY: string;
     private accessSignature: SignOptions;
     private refreshSignature: SignOptions;
 
-    constructor(cachedMemory: ICachedMemory) {
+    constructor(@inject(TYPES.CacheMemory) cachedMemory: ICacheMemory) {
         this.cachedMemory = cachedMemory;
         this.JWT_SECRET_KEY = process.env.JWT_SECRET_KEY!;
         this.accessSignature = {

@@ -1,13 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-
-interface AuthStrategyInterface {
-    authenticate(req: Request, res: Response): Promise<boolean>;
-}
+import {IAuthStrategy} from './interface';
 
 class AuthStrategy {
-    private strategy: AuthStrategyInterface;
+    private strategy: IAuthStrategy;
 
-    constructor(strategy: AuthStrategyInterface) {
+    constructor(strategy: IAuthStrategy) {
         this.strategy = strategy;
     }
 
