@@ -4,10 +4,12 @@ export interface UserInformation {
     password?: string;
 }
 
-export interface TokenPayload {
-    ok: boolean;
-    id?: number;
-    userId?: string;
-    message?: string;
+export const TYPES = {
+    CacheMemory: Symbol.for('CacheMemory'),
+    JWTService: Symbol.for('JWTService'),
+    AuthStrategy: {
+        JWT: Symbol.for('AuthStrategy'),
+    },
+    AuthMiddleware: Symbol.for('AuthMiddleware')
 }
 

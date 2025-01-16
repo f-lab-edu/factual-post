@@ -1,6 +1,6 @@
 class SingletonContainer {
     private static instance: SingletonContainer | null = null;
-    private instances: Map<string, unknown>; // any 부분을 jwtService 또는 Redis 라던지 이런식으로 변경해야함.
+    private instances: Map<string, unknown>;
 
     constructor() {
         this.instances = new Map();

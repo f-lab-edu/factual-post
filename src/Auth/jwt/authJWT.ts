@@ -1,12 +1,15 @@
 import {Request, Response} from 'express';
 import { setAuthHeader, splitAuthorizationType, extractUserPayload } from '../Util/authUtil';
 import { JwtPayload } from 'jsonwebtoken';
+import { TYPES } from '../../types';
+import { inject, injectable } from 'inversify';
+import {IAuthStrategy} from '../../Interface/interface';
 import JWTService from './jwt';
 
 class VerifyToken {
     private jwtService: JWTService;
 
-    constructor(jwtService: JWTService) {
+    constructor(@inject(TYPES.JWTService) jwtService: JWTService) {
         this.jwtService = jwtService;
     }
 
@@ -31,7 +34,8 @@ class VerifyToken {
     }
 }
 
-class AuthJWT extends VerifyToken {
+@injectable()
+class JWT extends VerifyToken implements IAuthStrategy{
     private JWT_EXPIRED = Symbol('jwt expired');
 
     async authenticate(req: Request, res: Response): Promise<boolean> {
@@ -79,4 +83,4 @@ class AuthJWT extends VerifyToken {
     }
 }
 
-export default AuthJWT;
+export default JWT;
